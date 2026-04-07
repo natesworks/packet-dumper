@@ -34,7 +34,6 @@ function append(text) {
   contents += text + "\n";
 }
 
-// LogicLong::decode
 Interceptor.attach(base.add(0x10fd298), {
   onEnter(args) {
     this.logicLong = args[0];
@@ -47,7 +46,7 @@ Interceptor.attach(base.add(0x10fd298), {
           this.logicLong.readS32() +
           ", " +
           this.logicLong.add(4).readS32() +
-          ").encode(&stream);",
+          ").encode(&stream);"
       );
     }
   },
@@ -57,7 +56,6 @@ const getString = new NativeFunction(base.add(0x1111320), "pointer", [
   "pointer",
 ]);
 
-// LogicCompressedString::decode
 Interceptor.attach(base.add(0x11112c4), {
   onEnter(args) {
     this.instance = args[0];
@@ -68,9 +66,9 @@ Interceptor.attach(base.add(0x11112c4), {
   onLeave(retval) {
     if (state == 2) {
       append(
-        'LogicCompressedString(new String("' +
+        'LogicCompressedString(R"(' +
           decodeString(getString(retval)) +
-          '")).encode(&stream);',
+          ')").encode(&stream);'
       );
       state = 1;
     }
@@ -94,9 +92,9 @@ Interceptor.attach(ByteStreamVtable.index(23), {
     if (state == 1) {
       if (!retval.isNull() && !this.a3.isNull()) {
         append(
-          'stream.writeStringReference(new String("' +
+          'stream.writeStringReference(R"(' +
             decodeString(this.a3) +
-            '"));',
+            ')");'
         );
       } else {
         append("stream.writeStringReference(nullptr);");
@@ -110,7 +108,7 @@ Interceptor.attach(ByteStreamVtable.index(24), {
     if (state == 1)
       if (!retval.isNull()) {
         append(
-          'stream.writeString(new String("' + decodeString(retval) + '"));',
+          'stream.writeString(R"(' + decodeString(retval) + ')");'
         );
       } else {
         append("stream.writeString(nullptr);");
@@ -123,7 +121,7 @@ Interceptor.attach(ByteStreamVtable.index(25), {
     if (state == 1)
       if (!retval.isNull()) {
         append(
-          'stream.writeString(new String("' + decodeString(retval) + '"));',
+          'stream.writeString(R"(' + decodeString(retval) + ')");'
         );
       } else {
         append("stream.writeString(nullptr);");
@@ -228,8 +226,9 @@ Interceptor.attach(ByteStreamVtable.index(37), {
           retval.readS32() +
           ", " +
           retval.add(4).readS32() +
-          "));",
+          "));"
       );
+      state = 1;
     }
   },
 });
@@ -247,8 +246,9 @@ Interceptor.attach(ByteStreamVtable.index(38), {
           retval.readS32() +
           ", " +
           retval.add(4).readS32() +
-          ");",
+          "));"
       );
+      state = 1;
     }
   },
 });
@@ -256,7 +256,7 @@ Interceptor.attach(ByteStreamVtable.index(38), {
 Interceptor.attach(ByteStreamVtable.index(40), {
   onLeave(retval) {
     if (state == 1) {
-      append("stream.writeInt(" + retval.toInt32() + ");"); // note: usually you do writeBytes which writes both bytes and the length
+      append("stream.writeInt(" + retval.toInt32() + ");");
     }
   },
 });
@@ -280,8 +280,8 @@ Interceptor.attach(ByteStreamVtable.index(41), {
           bytesString +
           " }, " +
           this.len +
-          ");",
-      ); // note: usually you do writeBytes which writes both bytes and the length
+          ");"
+      );
     }
   },
 });
