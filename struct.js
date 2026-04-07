@@ -228,7 +228,7 @@ Interceptor.attach(ByteStreamVtable.index(37), {
           retval.readS32() +
           ", " +
           retval.add(4).readS32() +
-          ");",
+          "));",
       );
     }
   },
